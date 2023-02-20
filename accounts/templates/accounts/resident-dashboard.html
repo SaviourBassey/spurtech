@@ -1,0 +1,59 @@
+
+
+    {% block body %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+    <div class="jumbotron mt-5">
+        <h1 class="display-4">Resident Dashboard</h1>
+        <p class="lead">Welcome {{ request.user }}</p>
+        <hr class="my-4">
+        {% if token %}
+        <p><b id="token">{{ token.token }}</b> <button class="btn btn-transparent btn-sm" onclick="copyFunction()" id="copyBtn">Copy<i class="fas fas fa-copy uk-margin-small-left"></i></button></p>
+        <p>Token Expiration: <span>Token Expires in 30min</span></p>
+        {% else %}
+        <p><b>No Token</b></p>
+        {% endif %}
+        <button id="tokenBtn" class="btn btn-primary btn-lg">Generate New Token</button>
+    </div>
+
+
+
+    <script>
+        $(document).ready(function(){
+            $('#tokenBtn').on('click', function(e){
+                $.ajax({
+                    method:'POST',
+                    url:"{% url 'residenttoken:generate_resident_token_view' %}",
+                    data:{
+                        csrfmiddlewaretoken:"{{ csrf_token }}"
+                    }, 
+                    success: function(data) {
+                        
+                        document.getElementById("token").innerHTML = data.token;
+                        
+                    },
+                });
+                
+            });
+        });
+    </script> 
+
+    <script>
+        function copyFunction(){
+            const copyText = document.getElementById("token").innerHTML;
+            console.log(copyText);
+
+            // Copy the text inside the text field
+            navigator.clipboard.writeText(copyText);
+
+            // Change copy to copied
+            document.getElementById("copyBtn").innerHTML = "Copied!";
+            const myTimeout = setTimeout(changeTextBack, 2000);
+
+            function changeTextBack() {
+                document.getElementById("copyBtn").innerHTML = "Copy<i class='fas fas fa-copy uk-margin-small-left'></i>";
+            }
+        }
+    </script>
+    {% endblock body %}
