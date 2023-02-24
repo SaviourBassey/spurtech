@@ -1,0 +1,58 @@
+
+
+    {% block body %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+    <div class="jumbotron mt-5">
+        <h1 class="display-4">Admin Dashboard</h1>
+        <p class="lead">Welcome {{ request.user }}</p>
+        <hr class="my-4">
+        <div>
+            <label for="">Enter Token:</label> <br>
+            <input type="text" name="token" id="residentToken" maxlength="6" oninput="tokenFunction()">
+        </div>
+        <button id="confirmtokenBtn" class="btn btn-primary btn-lg" disabled>Confirm Token</button>
+        <div>
+            <p id="confirmationMessage"></p>
+        </div>
+    </div>
+
+
+
+    <script>
+        function tokenFunction() {
+            let tokenValue = document.getElementById("residentToken").value;
+            if (tokenValue.length == 6) {
+                document.getElementById("confirmtokenBtn").removeAttribute("disabled")
+            }
+            else{
+                document.getElementById("confirmtokenBtn").setAttribute("disabled","disabled")
+            }
+        }
+
+        $(document).ready(function(){
+            $('#confirmtokenBtn').on('click', function(e){
+                $.ajax({
+                    method:'POST',
+                    url:"{% url 'residenttoken:verify_resident_token_view' %}",
+                    data:{
+                        csrfmiddlewaretoken:"{{ csrf_token }}",
+                        token: document.getElementById("residentToken").value
+                    }, 
+                    success: function(data) {
+                        
+                        if (data.message == "success") {
+                            document.getElementById("confirmationMessage").innerHTML = "Visitor confirm!"
+                        } else {
+                            document.getElementById("confirmationMessage").innerHTML = "Invalid code!"
+                        }
+                        
+                    },
+                });
+                
+            });
+        });
+    </script> 
+
+    {% endblock body %}

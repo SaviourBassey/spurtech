@@ -45,6 +45,29 @@ class LoginView(View):
             message = "No account with that credentials"
             return redirect("accounts:login_view")
 
+
+class AdminLoginView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "accounts/admin-login.html")
+    
+    def post(self, request, *args, **kwargs):
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        if User.objects.filter(username=username).exists():
+            user = authenticate(request, username=username, password=password)
+            if user is not None and user.is_superuser:
+                login(request, user)
+                messages = f"Welcome back {username}"
+                return redirect("accounts:admin_dashboard_view")
+            else:
+                print("not finally")
+                message = "Incorrect credentials "
+                return redirect("accounts:admin_login_view")
+        else:
+            message = "No account with that credentials"
+            return redirect("accounts:admin_login_view")
+
+
 class LogoutView(View):
     def get(self, request, *args, **kwargs):
         logout(request)
@@ -62,3 +85,8 @@ class ResidentDashboardView(LoginRequiredMixin, View):
             "token":token
         }
         return render(request, "accounts/resident-dashboard.html", context)
+    
+
+class AdminDashboardView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "accounts/admin-dashboard.html")
