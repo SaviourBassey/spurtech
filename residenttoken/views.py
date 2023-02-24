@@ -24,7 +24,7 @@ class GenerateResidentToken(LoginRequiredMixin, View):
 class VerifyResidentToken(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         token = request.POST.get("token")
-        if ResidentToken.objects.filter(user=request.user).exists():
+        if ResidentToken.objects.filter(token=token).exists():
             message = "success"
         else:
             message = "error"
